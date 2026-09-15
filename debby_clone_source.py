@@ -3,8 +3,6 @@ import subprocess
 import os
 import shutil
 
-outcmd = subprocess.check_output(["apt", "list", '--installed'])
-outcmd = [x for x in outcmd.decode().split('\n') if x]
 
 osrelease = dict([x.strip().split('=') for x in open('/etc/os-release').readlines()])
 codename = osrelease['VERSION_CODENAME']
@@ -14,6 +12,8 @@ native = ['amd64', 'all']
 outpkgs = []
 outpkgs_local = []
 
+outcmd = subprocess.check_output(["apt", "list", '--installed'])
+outcmd = [x for x in outcmd.decode().split('\n') if x]
 for x in outcmd:
 	if x!='Listing...':
 		splitv = x.split('/', 1)
@@ -31,22 +31,22 @@ for x in outcmd:
 if not os.path.exists('migration_data'):
     os.makedirs('migration_data')
 
-f = open('migration_data/codename.txt', 'w')
+keyf = 'migration_data/'
+
+f = open(keyf+'codename.txt', 'w')
 f.write(codename)
 f.flush()
 f.close()
 
-f = open('migration_data/packages.txt', 'w')
+f = open(keyf+'packages.txt', 'w')
 for x in outpkgs: f.write(x+'\n')
 f.flush()
 f.close()
 
-f = open('migration_data/packages_local.txt', 'w')
+f = open(keyf+'packages_local.txt', 'w')
 for x in outpkgs_local: f.write(x+'\n')
 f.flush()
 f.close()
-
-keyf = 'migration_data/'+codename
 
 if not os.path.exists(keyf): os.makedirs(keyf)
 
